@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Fast Electro Mechanic</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Using same colors as main site */
+        :root {
+            --color-primary-dark: #000000;
+            --color-accent-red: #FF0000;
+            --color-neutral-white: #FFFFFF;
+            --color-neutral-light-gray: #F8F8F8;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-neutral-light-gray);
+        }
+        .admin-form-container {
+            background-color: var(--color-neutral-white);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .admin-form-container input, 
+        .admin-form-container textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-bottom: 1rem;
+        }
+        .admin-form-container button {
+            cursor: pointer;
+        }
+        .admin-delete-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .admin-delete-btn {
+            background-color: var(--color-accent-red);
+            color: var(--color-neutral-white);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .admin-delete-btn:hover {
+            background-color: #cc0000;
+        }
+    </style>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-neutral-light-gray text-primary-dark">
+
+    <header class="bg-primary-dark text-neutral-white py-4 shadow-lg">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-bold">Client Admin Panel</h1>
+            <p class="text-sm">Fast Electro Mechanic Solutions</p>
+        </div>
+    </header>
+
+    <main class="py-12 px-6">
+        <div class="container mx-auto text-center max-w-2xl">
+            
+            <!-- Login Form -->
+            <div id="admin-login-form" class="bg-neutral-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-primary-dark mb-6">Admin Login</h2>
+                <label for="admin-email" class="block text-left text-primary-dark font-semibold mb-1">Email:</label>
+                <input type="email" id="admin-email" class="w-full px-4 py-2 border border-primary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-accent-red" placeholder="admin@fems.com">
+                <label for="admin-password" class="block text-left text-primary-dark font-semibold mb-1 mt-4">Password:</label>
+                <input type="password" id="admin-password" class="w-full px-4 py-2 border border-primary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-accent-red" placeholder="••••••••">
+                <button id="admin-login-btn" class="mt-4 bg-primary-dark text-neutral-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-red-700 transition duration-300 ease-in-out">
+                    Login
+                </button>
+                <p id="admin-login-error" class="text-accent-red mt-2 hidden">Wrong email or password!</p>
+            </div>
+
+            <!-- Main Admin Panel (Hidden by default) -->
+            <div id="admin-panel" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-primary-dark">Manage Website Content</h2>
+                    <button id="admin-logout-btn" class="bg-gray-500 text-neutral-white font-bold py-2 px-6 rounded-full hover:bg-gray-700 transition duration-300">
+                        Logout
+                    </button>
+                </div>
+                
+                <!-- Manage Blog -->
+                <div class="admin-form-container text-left">
+                    <h3 class="text-2xl font-semibold text-primary-dark mb-4">Manage Blog Posts</h3>
+                    
+                    <form id="admin-blog-form">
+                        <label for="blog-title" class="font-semibold">Blog Title:</label>
+                        <input type="text" id="blog-title" required>
+                        
+                        <label for="blog-content" class="font-semibold">Blog Content (Snippet):</label>
+                        <textarea id="blog-content" rows="3" required></textarea>
+                        
+                        <button type="submit" class="bg-accent-red text-neutral-white font-bold py-2 px-6 rounded-full hover:bg-red-700 transition duration-300">Add Blog Post</button>
+                    </form>
+                    <hr class="my-6 border-gray-300">
+                    <h4 class="text-xl font-semibold mb-2">Current Blog Posts:</h4>
+                    <ul id="admin-blog-list" class="admin-delete-list">
+                        <!-- List populated by JS -->
+                    </ul>
+                </div>
+
+                <!-- Manage Projects -->
+                <div class="admin-form-container text-left">
+                    <h3 class="text-2xl font-semibold text-primary-dark mb-4">Manage Projects (Our Work)</h3>
+                    <form id="admin-project-form">
+                        <label for="project-title" class="font-semibold">Project Title:</label>
+                        <input type="text" id="project-title" required>
+                        
+                        <label for="project-desc" class="font-semibold">Project Description:</label>
+                        <input type="text" id="project-desc" required>
+                        
+                        <label for="project-image-url" class="font-semibold">Project Image URL:</label>
+                        <input type="text" id="project-image-url" placeholder="https://example.com/image.jpg" required>
+                        
+                        <button type="submit" class="bg-accent-red text-neutral-white font-bold py-2 px-6 rounded-full hover:bg-red-700 transition duration-300">Add Project</button>
+                    </form>
+                    <hr class="my-6 border-gray-300">
+                    <h4 class="text-xl font-semibold mb-2">Current Projects:</h4>
+                    <ul id="admin-project-list" class="admin-delete-list">
+                        <!-- List populated by JS -->
+                    </ul>
+                </div>
+
+                <!-- Manage Gallery -->
+                <div class="admin-form-container text-left">
+                    <h3 class="text-2xl font-semibold text-primary-dark mb-4">Manage Gallery Images</h3>
+                    <form id="admin-gallery-form">
+                        <label for="gallery-image-url" class="font-semibold">Gallery Image URL:</label>
+                        <input type="text" id="gallery-image-url" placeholder="https://example.com/image.jpg" required>
+
+                        <label for="gallery-image-alt" class="font-semibold">Image Alt Text (Description):</label>
+                        <input type="text" id="gallery-image-alt" placeholder="e.g., 'New electrical wiring'" required>
+                        
+                        <button type="submit" class="bg-accent-red text-neutral-white font-bold py-2 px-6 rounded-full hover:bg-red-700 transition duration-300">Add Gallery Image</button>
+                    </form>
+                    <hr class="my-6 border-gray-300">
+                    <h4 class="text-xl font-semibold mb-2">Current Gallery Images:</h4>
+                    <ul id="admin-gallery-list" class="admin-delete-list">
+                        <!-- List populated by JS -->
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase SDK Scripts -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            deleteDoc, 
+            doc,
+            onSnapshot, // Using onSnapshot for real-time updates
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- NEW FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2LGYQeZxGPLrqPu9SmI_jnyfEFb_1ERM",
+            authDomain: "fast-electromechanic-sol-64831.firebaseapp.com",
+            projectId: "fast-electromechanic-sol-64831",
+            storageBucket: "fast-electromechanic-sol-64831.firebasestorage.app",
+            messagingSenderId: "1086586935220",
+            appId: "1:1086586935220:web:22a964fd9e38c6598084e1",
+            measurementId: "G-84YKKFDT01"
+        };
+        
+        // Use projectId as the appId for database paths
+        const appId = firebaseConfig.projectId;
+
+        // Initialize Firebase
+        let app, db, auth;
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app); // Initialize Auth
+            setLogLevel('debug'); // For development, shows logs
+            console.log("Firebase Initialized Successfully.");
+        } catch (e) {
+            console.error("Error initializing Firebase: ", e);
+            document.body.innerHTML = `<div style="padding: 2rem; text-align: center; font-size: 1.2rem; color: red;">Error: Could not connect to the database. Please check Firebase configuration.</div>`;
+        }
+
+        // --- COLLECTION REFERENCES ---
+        const blogCollection = collection(db, `artifacts/${appId}/public/data/blog`);
+        const projectsCollection = collection(db, `artifacts/${appId}/public/data/projects`);
+        const galleryCollection = collection(db, `artifacts/${appId}/public/data/gallery`);
+
+
+        // --- LOAD DYNAMIC CONTENT FOR ADMIN LISTS ---
+        
+        // 1. Load Blog Posts
+        function loadBlogPosts() {
+            const adminList = document.getElementById('admin-blog-list');
+            
+            onSnapshot(blogCollection, (querySnapshot) => {
+                adminList.innerHTML = ''; // Clear list
+                if (querySnapshot.empty) {
+                    adminList.innerHTML = '<li>No blog posts found.</li>';
+                    return;
+                }
+                querySnapshot.forEach((doc) => {
+                    const post = doc.data();
+                    const postId = doc.id;
+                    const adminItem = document.createElement('li');
+                    adminItem.innerHTML = `<span>${post.title}</span><button class="admin-delete-btn" data-id="${postId}" data-collection="blog">Delete</button>`;
+                    adminList.appendChild(adminItem);
+                });
+            }, (error) => {
+                console.error("Error loading blog posts: ", error);
+                adminList.innerHTML = '<li>Error loading posts.</li>';
+            });
+        }
+        
+        // 2. Load Projects
+        function loadProjects() {
+            const adminList = document.getElementById('admin-project-list');
+            
+            onSnapshot(projectsCollection, (querySnapshot) => {
+                adminList.innerHTML = ''; // Clear list
+                if (querySnapshot.empty) {
+                    adminList.innerHTML = '<li>No projects found.</li>';
+                    return;
+                }
+                querySnapshot.forEach((doc) => {
+                    const project = doc.data();
+                    const projectId = doc.id;
+                    const adminItem = document.createElement('li');
+                    adminItem.innerHTML = `<span>${project.title}</span><button class="admin-delete-btn" data-id="${projectId}" data-collection="projects">Delete</button>`;
+                    adminList.appendChild(adminItem);
+                });
+            }, (error) => {
+                console.error("Error loading projects: ", error);
+                adminList.innerHTML = '<li>Error loading projects.</li>';
+            });
+        }
+        
+        // 3. Load Gallery Images
+        function loadGalleryImages() {
+            const adminList = document.getElementById('admin-gallery-list');
+            
+            onSnapshot(galleryCollection, (querySnapshot) => {
+                adminList.innerHTML = ''; // Clear list
+                if (querySnapshot.empty) {
+                    adminList.innerHTML = '<li>No gallery images found.</li>';
+                    return;
+                }
+                querySnapshot.forEach((doc) => {
+                    const image = doc.data();
+                    const imageId = doc.id;
+                    const adminItem = document.createElement('li');
+                    adminItem.innerHTML = `<span>${image.altText}</span><button class="admin-delete-btn" data-id="${imageId}" data-collection="gallery">Delete</button>`;
+                    adminList.appendChild(adminItem);
+                });
+            }, (error) => {
+                console.error("Error loading gallery: ", error);
+                adminList.innerHTML = '<li>Error loading gallery.</li>';
+            });
+        }
+
+        // --- ADMIN PANEL LOGIC ---
+
+        function showAdminPanel() {
+            document.getElementById('admin-login-form').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            // Load content *after* login
+            loadBlogPosts();
+            loadProjects();
+            loadGalleryImages();
+        }
+
+        function showLoginForm() {
+            document.getElementById('admin-login-form').style.display = 'block';
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+
+        // 1. Admin Login
+        document.getElementById('admin-login-btn').addEventListener('click', () => {
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            const errorMsg = document.getElementById('admin-login-error');
+            
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    console.log("Admin user signed in:", userCredential.user.email);
+                    // onAuthStateChanged will handle showing the panel
+                    errorMsg.classList.add('hidden');
+                })
+                .catch((error) => {
+                    console.error("Admin Login Error:", error.code, error.message);
+                    errorMsg.classList.remove('hidden');
+                });
+        });
+        
+        // 2. Admin Logout
+        document.getElementById('admin-logout-btn').addEventListener('click', () => {
+            signOut(auth).catch((error) => {
+                console.error("Sign Out Error", error);
+            });
+            // onAuthStateChanged will handle showing the login form
+        });
+
+        // 3. Handle Add Forms
+        document.getElementById('admin-blog-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('blog-title').value;
+            const content = document.getElementById('blog-content').value;
+            try {
+                await addDoc(blogCollection, {
+                    title: title,
+                    content: content,
+                    createdAt: new Date()
+                });
+                e.target.reset();
+                // No need to call loadBlogPosts(), onSnapshot handles it!
+            } catch (e) {
+                console.error("Error adding blog post: ", e);
+            }
+        });
+
+        document.getElementById('admin-project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('project-title').value;
+            const description = document.getElementById('project-desc').value;
+            const imageUrl = document.getElementById('project-image-url').value;
+            try {
+                await addDoc(projectsCollection, {
+                    title: title,
+                    description: description,
+                    imageUrl: imageUrl
+                });
+                e.target.reset();
+                // No need to call loadProjects(), onSnapshot handles it!
+            } catch (e) {
+                console.error("Error adding project: ", e);
+            }
+        });
+
+        document.getElementById('admin-gallery-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const imageUrl = document.getElementById('gallery-image-url').value;
+            const altText = document.getElementById('gallery-image-alt').value;
+            try {
+                await addDoc(galleryCollection, {
+                    imageUrl: imageUrl,
+                    altText: altText
+                });
+                e.target.reset();
+                // No need to call loadGalleryImages(), onSnapshot handles it!
+            } catch (e) {
+                console.error("Error adding gallery image: ", e);
+            }
+        });
+
+        // 4. Handle Delete Buttons (using event delegation)
+        document.getElementById('admin-panel').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('admin-delete-btn')) {
+                const id = e.target.dataset.id;
+                const collectionName = e.target.dataset.collection;
+                
+                // Use a standard confirm dialog
+                if (!confirm(`Are you sure you want to delete this item?`)) {
+                    return;
+                }
+                
+                let docRef;
+                if (collectionName === 'blog') docRef = doc(db, `artifacts/${appId}/public/data/blog`, id);
+                if (collectionName === 'projects') docRef = doc(db, `artifacts/${appId}/public/data/projects`, id);
+                if (collectionName === 'gallery') docRef = doc(db, `artifacts/${appId}/public/data/gallery`, id);
+                
+                try {
+                    await deleteDoc(docRef);
+                    // No need to call load functions, onSnapshot handles it!
+                } catch (e) {
+                    console.error("Error deleting document: ", e);
+                }
+            }
+        });
+
+         // --- RUN ON PAGE LOAD ---
+         document.addEventListener('DOMContentLoaded', () => {
+            // Listen for auth state changes
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in
+                    console.log("Auth state: Signed In", user.email);
+                    showAdminPanel();
+                } else {
+                    // User is signed out
+                    console.log("Auth state: Signed Out");
+                    showLoginForm();
+                }
+            });
+        });
+        
+    </script>
+
+</body>
+</html>
